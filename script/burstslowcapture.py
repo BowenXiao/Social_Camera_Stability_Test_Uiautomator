@@ -4,18 +4,17 @@
 from devicewrapper.android import device as d
 import unittest
 import commands
-import re
-import subprocess
 import os
 import string
 import time
 import sys
 import util 
 import string
+import random
 
 AD = util.Adb()
 TB = util.TouchButton()
-SM = util.SetMode() 
+SM = util.SetMode()
 
 #Written by XuGuanjun
 
@@ -64,6 +63,18 @@ FLASH_STATE     = PATH_0_0XML + ' | grep pref_camera_video_flashmode_key'
 #SCENE state check point
 SCENE_STATE     = PATH_0_0XML + ' | grep pref_camera_scenemode_key'
 
+#Exposure options
+EXPOSURE_OPTION = ['-6','-3','0','3','6']
+
+#Scene options
+SCENE_OPTION    = ['barcode','night-portrait','portrait','landscape','night','sports','auto']
+
+#Picture size options
+PICSIZE_OPTION  = ['WideScreen','StandardScreen']
+
+#Geo options
+GEO_OPTION      = ['off','on']
+
 class CameraTest(unittest.TestCase):
     def setUp(self):
         super(CameraTest,self).setUp()
@@ -76,219 +87,67 @@ class CameraTest(unittest.TestCase):
         SM.switchcamera('burstslow')
 
     def tearDown(self):
-    	AD.cmd('pm','com.intel.camera22') #Force reset the camera settings to default
         super(CameraTest,self).tearDown()
         self._pressBack(4)
 
-    def testCaptureWithExposureAuto(self):
+    def testCaptureWithExposure(self):
         '''
-            Summary: Capture image with Exposure auto
+            Summary: Capture image with Exposure
             Steps  :  
                 1.Launch burst activity and select Slow burst mode
-                2.Check exposure setting icon ,set to auto
+                2.Check exposure setting icon, random set a value
                 3.Touch shutter button to capture burst picture
-                4.Exit  activity
+                4.Exit activity
         '''
-        SM.setCameraSetting('burst',4,3)
-        assert bool(AD.cmd('cat',EXPOSURE_STATE).find('0')+1)
+        exposure = random.choice(EXPOSURE_OPTION) #Random select an option
+        SM.setCameraSetting('burst',4,EXPOSURE_OPTION.index(exposure)+1) #Tap on the selected option by its index
+        assert bool(AD.cmd('cat',EXPOSURE_STATE).find(exposure)+1)
         self._captureAndCheckPicCount('single',5)
 
-    def testCaptureWithExposurePlugOne(self):
+    def testCapturePictureWithScenes(self):
         '''
-            Summary: Capture image with Exposure plug one
+            Summary: Capture image with Scene
             Steps  :  
                 1.Launch burst activity and select Slow burst mode
-                2.Check exposure setting icon ,set to plug one
+                2.Check scence mode ,set mode
                 3.Touch shutter button to capture burst picture
-                4.Exit  activity
+                4.Exit activity
         '''
-        SM.setCameraSetting('burst',4,4)
-        assert bool(AD.cmd('cat',EXPOSURE_STATE).find('3')+1)
+        scene = random.choice(SCENE_OPTION) #Random select an option
+        SM.setCameraSetting('burst',3,SCENE_OPTION.index(scene)+1) #Tap on the selected option by its index
+        assert bool(AD.cmd('cat',SCENE_STATE).find(scene)+1)
         self._captureAndCheckPicCount('single',5)
 
-    def testCaptureWithExposurePlugTwo(self):
+    def testCaptureWithPictureSize(self):
         '''
-            Summary: Capture image with Exposure plug two
+            Summary: Capture image with Photo size
             Steps  :  
                 1.Launch burst activity and select Slow burst mode
-                2.Check exposure setting icon ,set to plug two
+                2.Check photo size ,set its size
                 3.Touch shutter button to capture burst picture
-                4.Exit  activity
+                4.Exit activity
         '''
-        SM.setCameraSetting('burst',4,5)
-        assert bool(AD.cmd('cat',EXPOSURE_STATE).find('6')+1)
+        size = random.choice(PICSIZE_OPTION) #Random select an option
+        SM.setCameraSetting('burst',2,PICSIZE_OPTION.index(size)+1) #Tap on the selected option by its index
+        assert bool(AD.cmd('cat',PICSIZE_STATE).find(size)+1)
         self._captureAndCheckPicCount('single',5)
+        SM.setCameraSetting('burst',2,1) #Force set to the default setting
 
-    def testCaptureWithExposureRedOne(self):
+    def testCapturepictureWithGeoLocation(self):
         '''
-            Summary: Capture image with Exposure red one
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check exposure setting icon ,set to red one
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',4,2)
-        assert bool(AD.cmd('cat',EXPOSURE_STATE).find('-3')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCaptureWithExposureRedTwo(self):
-        '''
-            Summary: Capture image with Exposure red two
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check exposure setting icon ,set to red two
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',4,1)
-        assert bool(AD.cmd('cat',EXPOSURE_STATE).find('-6')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCapturePictureWithScenesAuto(self):
-        '''
-            Summary: Capture image with Scene mode AUTO
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check scence mode ,set mode to AUTO
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',3,7)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('auto')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCapturePictureWithScenesSports(self):
-        '''
-            Summary: Capture image with Scene mode Sports
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check scence mode ,set mode to Sports
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',3,6)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('sports')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCapturePictureWithScenesNight(self):
-        '''
-            Summary: Capture image with Scene mode Night
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check scence mode ,set mode to Night
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',3,5)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('night')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCapturePictureWithScenesLandscape(self):
-        '''
-            Summary: Capture image with Scene mode Landscape
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check scence mode ,set mode to Landscape
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',3,4)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('landscape')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCapturePictureWithScenesPortrait(self):
-        '''
-            Summary: Capture image with Scene mode Portrait
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check scence mode ,set mode to Portrait
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',3,3)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('portrait')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCapturePictureWithScenesNightPortrait(self):
-        '''
-            Summary: Capture image with Scene mode Night-portrait
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check scence mode ,set mode to Night-portrait
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',3,2)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('night-portrait')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCapturePictureWithScenesBarcode(self):
-        '''
-            Summary: Capture image with Scene mode Barcode
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check scence mode ,set mode to Barcode
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',3,1)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('barcode')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCapturePictureWithSizeWidescreen(self):
-        '''
-            Summary: Capture image with Photo size 6MP
-            Steps  :  
-                1.Launch burst activity and select Slow burst mode
-                2.Check photo size ,set to 6MP
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',2,1)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('WideScreen')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def testCapturePictureWithSizeStandard(self):
-        '''
-            Summary: Capture image with Photo size 13MP
+            Summary: Capture image with Geo-tag
             Steps  : 
                 1.Launch burst activity and select Slow burst mode
-                2.Check photo size ,set to 13MP
+                2.Check geo-tag ,set Geo on/off
                 3.Touch shutter button to capture burst picture
-                4.Exit  activity
+                4.Exit activity
         '''
-        SM.setCameraSetting('burst',2,2)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('StandardScreen')+1)
-        self._captureAndCheckPicCount('single',5)
-    
-    def testCapturepictureWithGeoLocationOn(self):
-        '''
-            Summary: Capture image with Geo-tag ON
-            Steps  : 
-                1.Launch burst activity and select Slow burst mode
-                2.Check geo-tag ,set to ON
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',1,2)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('on')+1)
+        geo = random.choice(GEO_OPTION) #Random select an option
+        SM.setCameraSetting('burst',1,GEO_OPTION.index(geo)+1) #Tap on the selected option by its index
+        assert bool(AD.cmd('cat',GEO_STATE).find(geo)+1)
         self._captureAndCheckPicCount('single',5)
 
-    def testCapturepictureWithGeoLocationOff(self):
-        '''
-            Summary: Capture image with Geo-tag Off
-            Steps  : 
-                1.Launch burst activity and select Slow burst mode
-                2.Check geo-tag ,set to Off
-                3.Touch shutter button to capture burst picture
-                4.Exit  activity
-        '''
-        SM.setCameraSetting('burst',1,1)
-        assert bool(AD.cmd('cat',SCENE_STATE).find('off')+1)
-        self._captureAndCheckPicCount('single',5)
-
-    def _captureAndCheckPicCount(self,capturemode,delaytime):
+    def _captureAndCheckPicCount(self,capturemode,delaytime=2):
         beforeNo = AD.cmd('ls','/sdcard/DCIM/100ANDRO') #Get count before capturing
         TB.takePicture(capturemode)
         time.sleep(delaytime) #Sleep a few seconds for file saving

@@ -1,15 +1,26 @@
 #!/usr/bin/env python
-#from uiautomatorplug.android import device as d
 from devicewrapper.android import device as d
 import time
 import unittest
 import commands
 import util
 import string
+import random
 
 A  = util.Adb()
 SM = util.SetMode()
 TB = util.TouchButton()
+
+FLASH_MODE      = ['off','on','auto']
+EXPOSURE_MODE   = ['-6','-3','0','3','6']
+SCENE_MODE      = ['barcode','night-portrait','portrait','landscape','night','sports','auto']
+FDFR_MODE       = ['on','off']
+PICTURESIZE_MODE= ['WideScreen','StandardScreen']
+HINTS_MODE      = ['off','on']
+LOCATION_MODE   = ['off','on']
+TIMER_MODE      = ['0','3','5','10']
+ISO_MODE        = ['iso-800','iso-400','iso-200','iso-100','iso-auto']
+WB_MODE         = ['cloudy','fluorescent','daylight','incandescent','auto']
 
 class CameraTest(unittest.TestCase):
 
@@ -24,675 +35,217 @@ class CameraTest(unittest.TestCase):
         time.sleep(2)
         if  d(text = 'OK').wait.exists(timeout = 3000):
             d(text = 'OK').click.wait()
-        assert d(resourceId = 'com.intel.camera22:id/shutter_button'),'Launch camera failed!!'
-
+        else:
+            assert d(resourceId = 'com.intel.camera22:id/shutter_button'),'Launch camera failed!!'
 
     def tearDown(self):
         super(CameraTest,self).tearDown()
         #4.Exit  activity
         self._pressBack(4)
-        A.cmd('pm','com.intel.camera22')
+        TB.switchBackOrFrontCamera('back')
 
 
     # Testcase 1
-    def testCaptureSingleImageWithFlashOn(self):
+    def testCaptureSingleImageWithFlash(self):
         """
-        Summary:Capture image with Flash ON.
+        Summary:Capture image with Flash.
         Step:
         1.Launch single capture activity
-        2.Set flash ON
+        2.Set flash mode
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2 Set flash ON
-        SM.setCameraSetting('single','flash','on')
-        self._confirmSettingMode('flash','on')
+        flash_mode = random.choice(FLASH_MODE)
+        # Step 2
+        SM.setCameraSetting('single','flash',flash_mode)
+        self._confirmSettingMode('flash',flash_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
 
     # Testcase 2
-    def testCaptureSingleImageWithFlashOff(self):
+    def testCaptureSingleImageWithExposure(self):
         """
-        Summary:Capture image with Flash OFF.
+        Summary:Capture image with Exposure mode.
         Step:
         1.Launch single capture activity
-        2.Set flash OFF
+        2.Set exposure mode
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2 Set flash OFF
-        SM.setCameraSetting('single','flash','off')
-        self._confirmSettingMode('flash','off')
+        exposure_mode = random.choice(EXPOSURE_MODE)
+        # Step 2
+        SM.setCameraSetting('single',6,EXPOSURE_MODE.index(exposure_mode)+1)
+        self._confirmSettingMode('exposure',exposure_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
 
     # Testcase 3
-    def testCaptureSingleImageWithFlashAuto(self):
+    def testCaptureSingleImageWithScene(self):
         """
-        Summary:Capture image with Flash AUTO.
+        Summary:Capture image with Scene mode.
         Step:
         1.Launch single capture activity
-        2.Set flash to AUTO mode
+        2.Set scene mode
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2 Set flash AUTO
-        SM.setCameraSetting('single','flash','auto')
-        self._confirmSettingMode('flash','auto')
+        scene_mode = random.choice(SCENE_MODE)
+        # Step 2 
+        SM.setCameraSetting('single',5,SCENE_MODE.index(scene_mode)+1)
+        self._confirmSettingMode('scenemode',scene_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
 
     # Testcase 4
-    def testCaptureSingleImageWithExposureAuto(self):
+    def testCaptureSingleImageWithFDFR(self):
         """
-        Summary:Capture image with Exposure auto.
-        Step:
-        1.Launch single capture activity
-        2.Set exposure auto
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set exposure auto
-        SM.setCameraSetting('single',6,3)
-        self._confirmSettingMode('exposure','0')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 5
-    def testCaptureSingleImageWithExposurePlusOne(self):
-        """
-        Summary:Capture image with Exposure 1.
-        Step:
-        1.Launch single capture activity
-        2.Set exposure 1
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set exposure 1
-        SM.setCameraSetting('single',6,4)
-        self._confirmSettingMode('exposure','3')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 6
-    def testCaptureSingleImageWithExposurePlusTwo(self):
-        """
-        Summary:Capture image with Exposure 2.
-        Step:
-        1.Launch single capture activity
-        2.Set exposure 2
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set exposure 2
-        SM.setCameraSetting('single',6,5)
-        self._confirmSettingMode('exposure','6')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 7
-    def testCaptureSingleImageWithExposureRedOne(self):
-        """
-        Summary:Capture image with Exposure -1.
-        Step:
-        1.Launch single capture activity
-        2.Set exposure -1
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set exposure -1
-        SM.setCameraSetting('single',6,2)
-        self._confirmSettingMode('exposure','-3')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 8
-    def testCaptureSingleImageWithExposureRedTwo(self):
-        """
-        Summary:Capture image with Exposure -2.
-        Step:
-        1.Launch single capture activity
-        2.Set exposure -2
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set exposure -2
-        SM.setCameraSetting('single',6,1)
-        self._confirmSettingMode('exposure','-6')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 9
-    def testCaptureSingleImageWithSceneAuto(self):
-        """
-        Summary:Capture image with Scene mode AUTO.
-        Step:
-        1.Launch single capture activity
-        2.Set scene mode AUTO
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode AUTO
-        SM.setCameraSetting('single',5,7)
-        self._confirmSettingMode('scenemode','auto')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 10
-    def testCaptureSingleImageWithSceneSports(self):
-        """
-        Summary:Capture image with Scene mode Sports.
-        Step:
-        1.Launch single capture activity
-        2.Set scene mode Sports
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode Sports
-        SM.setCameraSetting('single',5,6)
-        self._confirmSettingMode('scenemode','sports')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 11
-    def testCaptureSingleImageWithSceneNight(self):
-        """
-        Summary:Capture image with Scene mode Night.
-        Step:
-        1.Launch single capture activity
-        2.Set scene mode Night
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode Night
-        SM.setCameraSetting('single',5,5)
-        self._confirmSettingMode('scenemode','night')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 12
-    def testCaptureSingleImageWithSceneLandscape(self):
-        """
-        Summary:Capture image with Scene mode Landscape.
-        Step:
-        1.Launch single capture activity
-        2.Set scene mode Landscape
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode Landscape
-        SM.setCameraSetting('single',5,4)
-        self._confirmSettingMode('scenemode','landscape')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 13
-    def testCaptureSingleImageWithScenePortrait(self):
-        """
-        Summary:Capture image with Scene mode Portrait.
-        Step:
-        1.Launch single capture activity
-        2.Set scene mode Portrait
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode Portrait
-        SM.setCameraSetting('single',5,3)
-        self._confirmSettingMode('scenemode','portrait')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 14
-    def testCaptureSingleImageWithSceneNightPortrait(self):
-        """
-        Summary:Capture image with Scene mode NightPortrait.
-        Step:
-        1.Launch single capture activity
-        2.Set scene mode NightPortrait
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode NightPortrait
-        SM.setCameraSetting('single',5,2)
-        self._confirmSettingMode('scenemode','night-portrait')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 15
-    def testCaptureSingleImageWithSceneBarcode(self):
-        """
-        Summary:Capture image with Scene mode barcode.
-        Step:
-        1.Launch single capture activity
-        2.Set scene mode barcode
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode barcode
-        SM.setCameraSetting('single',5,1)
-        self._confirmSettingMode('scenemode','barcode')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 16
-    def testCaptureSingleImageWithFDFROn(self):
-        """
-        Summary:Capture image with FD/FR ON.
+        Summary:Capture image with FD/FR.
         Step:
         1.Launch single capture activity
         2.Set FD/FR ON
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2  Set FD/FR ON, confirm fdfr is 'on' method is achieved in SM.setCameraSetting().
-        SM.setCameraSetting('single','fdfr','on')
+        fdfr_mode = random.choice(FDFR_MODE)
+        # Step 2  Set FD/FR mode, confirm fdfr mode method is achieved in SM.setCameraSetting().
+        SM.setCameraSetting('single','fdfr',fdfr_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
 
-    # Testcase 17
-    def testCaptureSingleImageWithFDFROff(self):
+    # Testcase 5
+    def testCaptureSingleImageWithPictureSize(self):
         """
-        Summary:Capture image with FD/FR Off.
+        Summary:Capture image with Photo size.
         Step:
         1.Launch single capture activity
-        2.Set FD/FR Off
+        2.Set photo size
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2  Set FD/FR Off, confirm fdfr is 'on' method is achieved in SM.setCameraSetting().
-        SM.setCameraSetting('single','fdfr','off')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 18
-    def testCaptureSingleImageWithPictureSizeWidescreen(self):
-        """
-        Summary:Capture image with Photo size 6M.
-        Step:
-        1.Launch single capture activity
-        2.Set photo size 6M
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set photo size 6M
-        SM.setCameraSetting('single',4,1)
-        self._confirmSettingMode('picture_size','WideScreen')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 19
-    def testCaptureSingleImageWithPictureSizeStandardScreen(self):
-        """
-        Summary:Capture image with Scene mode barcode.
-        Step:
-        1.Launch single capture activity
-        2.Set photo size 13M
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set photo size 13M
-        SM.setCameraSetting('single',5,2)
-        self._confirmSettingMode('picture_size','StandardScreen')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 20
-    def testCaptureSingleImageWithHitsOn(self):
-        """
-        Summary:Capture image with Hints ON.
-        Step:
-        1.Launch single capture activity
-        2.Set Hints ON
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set Hints ON
-        SM.setCameraSetting('single',2,2)
-        self._confirmSettingMode('hints','on')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 21
-    def testCaptureSingleImageWithHitsOff(self):
-        """
-        Summary:Capture image with Hints OFF.
-        Step:
-        1.Launch single capture activity
-        2.Set Hints OFF
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set Hints OFF
-        SM.setCameraSetting('single',2,1)
-        self._confirmSettingMode('hints','off')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 22
-    def testCaptureSingleImageWithSelfTimerOff(self):
-        """
-        Summary:Capture image with Self-timer off.
-        Step:
-        1.Launch single capture activity
-        2.Set Self-timer off
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set Self-timer off
-        SM.setCameraSetting('single',9,1)
-        self._confirmSettingMode('delay','0')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 23
-    def testCaptureSingleImageWithSelfTimerThree(self):
-        """
-        Summary:Capture image with Self-timer 3s.
-        Step:
-        1.Launch single capture activity
-        2.Set Self-timer 3s
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set Self-timer 3s
-        SM.setCameraSetting('single',9,2)
-        self._confirmSettingMode('delay','3')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(5)
-
-    # Testcase 24
-    def testCaptureSingleImageWithSelfTimerFive(self):
-        """
-        Summary:Capture image with Self-timer 5s.
-        Step:
-        1.Launch single capture activity
-        2.Set Self-timer 5s
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set Self-timer 5s
-        SM.setCameraSetting('single',9,3)
-        self._confirmSettingMode('delay','5')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(7)
-
-    # Testcase 25
-    def testCaptureSingleImageWithSelfTimerTen(self):
-        """
-        Summary:Capture image with Self-timer 10s.
-        Step:
-        1.Launch single capture activity
-        2.Set Self-timer 10s
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set Self-timer 10s
-        SM.setCameraSetting('single',9,4)
-        self._confirmSettingMode('delay','10')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(12)
-
-    # Testcase 26
-    def testCaptureSingleImageWithISOAuto(self):
-        """
-        Summary:Capture image with ISO Setting Auto.
-        Step:
-        1.Launch single capture activity
-        2.Set ISO Setting Auto
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set ISO Setting Auto
-        SM.setCameraSetting('single',8,5)
-        self._confirmSettingMode('iso','iso-auto')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 27
-    def testCaptureSingleImageWithISOOneH(self):
-        """
-        Summary:Capture image with ISO Setting 100.
-        Step:
-        1.Launch single capture activity
-        2.Set ISO Setting 100
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set ISO Setting 100
-        SM.setCameraSetting('single',8,4)
-        self._confirmSettingMode('iso','iso-100')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 28
-    def testCaptureSingleImageWithISOTwoH(self):
-        """
-        Summary:Capture image with ISO Setting 200.
-        Step:
-        1.Launch single capture activity
-        2.Set ISO Setting 200
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set ISO Setting 200
-        SM.setCameraSetting('single',8,3)
-        self._confirmSettingMode('iso','iso-200')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 29
-    def testCaptureSingleImageWithISOFourH(self):
-        """
-        Summary:Capture image with ISO Setting 400.
-        Step:
-        1.Launch single capture activity
-        2.Set ISO Setting 400
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set ISO Setting 400
-        SM.setCameraSetting('single',8,2)
-        self._confirmSettingMode('iso','iso-400')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 30
-    def testCaptureSingleImageWithISOEightH(self):
-        """
-        Summary:Capture image with ISO Setting 800.
-        Step:
-        1.Launch single capture activity
-        2.Set ISO Setting 800
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set ISO Setting 800
-        SM.setCameraSetting('single',8,1)
-        self._confirmSettingMode('iso','iso-800')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 31
-    def testCaptureSingleImageWithWBAuto(self):
-        """
-        Summary:Capture image with White Balance Auto.
-        Step:
-        1.Launch single capture activity
-        2.Set White Balance Auto
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Capture image with White Balance Auto.
-        SM.setCameraSetting('single',7,5)
-        self._confirmSettingMode('whitebalance','auto')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 32
-    def testCaptureSingleImageWithWBIncandescent(self):
-        """
-        Summary:Capture image with White Balance Incandescent.
-        Step:
-        1.Launch single capture activity
-        2.Set White Balance Incandescent
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Capture image with White Balance Incandescent.
-        SM.setCameraSetting('single',7,4)
-        self._confirmSettingMode('whitebalance','incandescent')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 33
-    def testCaptureSingleImageWithWBDaylight(self):
-        """
-        Summary:Capture image with White Balance Daylight.
-        Step:
-        1.Launch single capture activity
-        2.Set White Balance Daylight
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Capture image with White Balance Daylight.
-        SM.setCameraSetting('single',7,3)
-        self._confirmSettingMode('whitebalance','daylight')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 34
-    def testCaptureSingleImageWithWBFluorescent(self):
-        """
-        Summary:Capture image with White Balance Fluorescent.
-        Step:
-        1.Launch single capture activity
-        2.Set White Balance Fluorescent
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Capture image with White Balance Fluorescent.
-        SM.setCameraSetting('single',7,2)
-        self._confirmSettingMode('whitebalance','fluorescent')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()  
-
-    # Testcase 35
-    def testCaptureSingleImageWithWBCloudy(self):
-        """
-        Summary:Capture image with White Balance Cloudy.
-        Step:
-        1.Launch single capture activity
-        2.Set White Balance Cloudy
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Capture image with White Balance Cloudy.
-        SM.setCameraSetting('single',7,1)
-        self._confirmSettingMode('whitebalance','cloudy')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()  
-
-    # Testcase 36
-    def testCaptureSingleImageWithLocationOn(self):
-        """
-        Summary:Capture image with Geo location on.
-        Step:
-        1.Launch single capture activity
-        2.Set location on.
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
+        size_mode = random.choice(PICTURESIZE_MODE)
         # Step 2 
-        SM.setCameraSetting('single',3,2)
-        self._confirmSettingMode('location','on')
+        SM.setCameraSetting('single',4,PICTURESIZE_MODE.index(size_mode)+1)
+        self._confirmSettingMode('picture_size',size_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
+        self._capturePictureAndConfirm(2)
 
-    # Testcase 37
-    def testCaptureSingleImageWithLocationOff(self):
+    # Testcase 6
+    def testCaptureSingleImageWithHits(self):
         """
-        Summary:Capture image with Geo location off.
+        Summary:Capture image with Hints.
         Step:
         1.Launch single capture activity
-        2.Set location off.
+        2.Set Hints
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
+        hints_mode = random.choice(HINTS_MODE)
         # Step 2 
-        SM.setCameraSetting('single',3,1)
-        self._confirmSettingMode('location','off')
+        SM.setCameraSetting('single',2,HINTS_MODE.index(hints_mode)+1)
+        self._confirmSettingMode('hints',hints_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
+        self._capturePictureAndConfirm(2)
 
-    # Testcase 38
-    def testFrontCaptureSingleImageWithLocationOn(self):
+    # Testcase 7
+    def testCaptureSingleImageWithSelfTimer(self):
         """
-        Summary:Capture image with Geo location on front camera.
+        Summary:Capture image with Self-timer.
         Step:
         1.Launch single capture activity
-        3.Switch to front camera
-        3.Set location on.
-        4.Touch shutter button to capture picture
-        5.Exit  activity
+        2.Set Self-timer
+        3.Touch shutter button to capture picture
+        4.Exit  activity
         """
-        TB.switchBackOrFrontCamera('front')
-        # Step 2 
-        SM.setCameraSetting('fsingle',1,2)
-        self._confirmSettingMode('location','on')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 39
-    def testFrontCaptureSingleImageWithLocationOff(self):
-        """
-        Summary:Capture image with Geo location off front camera.
-        Step:
-        1.Launch single capture activity
-        3.Switch to front camera
-        3.Set location off.
-        4.Touch shutter button to capture picture
-        5.Exit  activity
-        """
-        TB.switchBackOrFrontCamera('front')
+        timer_mode = random.choice(TIMER_MODE)
         # Step 2
-        SM.setCameraSetting('fsingle',1,1)
-        self._confirmSettingMode('location','off')
+        SM.setCameraSetting('single',9,TIMER_MODE.index(timer_mode)+1)
+        self._confirmSettingMode('delay',timer_mode)
+        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
+        self._capturePictureAndConfirm(2)
+
+    # Testcase 8
+    def testCaptureSingleImageWithISO(self):
+        """
+        Summary:Capture image with ISO Setting.
+        Step:
+        1.Launch single capture activity
+        2.Set ISO Setting
+        3.Touch shutter button to capture picture
+        4.Exit  activity
+        """
+        iso_mode = random.choice(ISO_MODE)
+        # Step 2
+        SM.setCameraSetting('single',8,ISO_MODE.index(iso_mode)+1)
+        self._confirmSettingMode('iso',iso_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm()
 
-    # Testcase 40
-    def testFrontCaptureSingleImageWithFDFROn(self):
+    # Testcase 9
+    def testCaptureSingleImageWithWB(self):
+        """
+        Summary:Capture image with White Balance.
+        Step:
+        1.Launch single capture activity
+        2.Set White Balance
+        3.Touch shutter button to capture picture
+        4.Exit  activity
+        """
+        wb_mode = random.choice(WB_MODE)
+        # Step 2
+        SM.setCameraSetting('single',7,WB_MODE.index(wb_mode)+1)
+        self._confirmSettingMode('whitebalance',wb_mode)
+        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
+        self._capturePictureAndConfirm()
+
+    def testCapturepictureWithLocation(self):
+        """
+        Summary:Capture image with Location.
+        Step:
+        1.Launch single capture activity
+        2.Set Geo location
+        3.Touch shutter button to capture picture
+        4.Exit  activity
+        """
+        location_mode = random.choice(LOCATION_MODE)
+        # Step 2
+        SM.setCameraSetting('single',7,LOCATION_MODE.index(location_mode)+1)
+        self._confirmSettingMode('location',location_mode)
+        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
+        self._capturePictureAndConfirm()
+
+    def testFrontFaceCapturePictureWithFD(self):
         """
         Summary:Capture image with FD/FR on front camera.
         Step:
         1.Launch single capture activity
-        3.Switch to front camera
-        3.Set FD/FR on.
-        4.Touch shutter button to capture picture
-        5.Exit  activity
+        2.Switch to front camera
+        3.Set FD/FR
+        3.Touch shutter button to capture picture
+        4.Exit  activity
         """
+        fdfr_mode = random.choice(FDFR_MODE)
         TB.switchBackOrFrontCamera('front')
-        # Step 2
-        SM.setCameraSetting('fsingle','fdfr','on')
+        SM.setCameraSetting('single','fdfr',fdfr_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
+        self._capturePictureAndConfirm(2)
 
-    # Testcase 41
-    def testFrontCaptureSingleImageWithFDFROff(self):
+    def testFrontFaceCapturepictureWithLocation(self):
         """
-        Summary:Capture image with FD/FR off front camera.
+        Summary:Capture image with location front camera.
         Step:
         1.Launch single capture activity
-        3.Switch to front camera
-        3.Set FD/FR off.
-        4.Touch shutter button to capture picture
-        5.Exit  activity
+        2.Switch to front camera
+        3.Set Geo location
+        3.Touch shutter button to capture picture
+        4.Exit  activity
         """
+        location_mode = random.choice(LOCATION_MODE)
         TB.switchBackOrFrontCamera('front')
         # Step 2
-        SM.setCameraSetting('fsingle','fdfr','off')
+        SM.setCameraSetting('single',7,LOCATION_MODE.index(location_mode)+1)
+        self._confirmSettingMode('whitebalance',wb_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
+        self._capturePictureAndConfirm()        
 
     def _pressBack(self,touchtimes):
         for i in range(1,touchtimes+1):

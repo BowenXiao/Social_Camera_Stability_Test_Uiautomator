@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#from uiautomatorplug.android import device as d
 from devicewrapper.android import device as d
 import time
 import unittest
@@ -11,6 +10,16 @@ A  = util.Adb()
 SM = util.SetMode()
 TB = util.TouchButton()
 
+FLASH_MODE      = ['off','on','auto']
+EXPOSURE_MODE   = ['-6','-3','0','3','6']
+SCENE_MODE      = ['barcode','night-portrait','portrait','landscape','night','sports','auto']
+FDFR_MODE       = ['on','off']
+PICTURESIZE_MODE= ['WideScreen','StandardScreen']
+HINTS_MODE      = ['off','on']
+LOCATION_MODE   = ['off','on']
+TIMER_MODE      = ['0','3','5','10']
+ISO_MODE        = ['iso-800','iso-400','iso-200','iso-100','iso-auto']
+WB_MODE         = ['cloudy','fluorescent','daylight','incandescent','auto']
 
 class CameraTest(unittest.TestCase):
 
@@ -25,9 +34,9 @@ class CameraTest(unittest.TestCase):
         time.sleep(2)
         if  d(text = 'OK').wait.exists(timeout = 3000):
             d(text = 'OK').click.wait()
-        assert d(resourceId = 'com.intel.camera22:id/shutter_button'),'Launch camera failed!!'
-        SM.switchcamera('smile')
-
+        else:
+            assert d(resourceId = 'com.intel.camera22:id/shutter_button'),'Launch camera failed!!'
+        TB.switchBackOrFrontCamera('back')
 
     def tearDown(self):
         super(CameraTest,self).tearDown()
@@ -36,466 +45,121 @@ class CameraTest(unittest.TestCase):
         A.cmd('pm','com.intel.camera22')
 
     # Testcase 1
-    def testCaptureSmileImageWithFlashOn(self):
+    def testCaptureSmileImageWithFlash(self):
         """
-        Summary:Capture image with Flash ON.
+        Summary:Capture image with Flash mode.
         Step:
         1.Launch smile capture activity
-        2.Set flash ON
+        2.Set flash mode
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2 Set flash ON
-        SM.setCameraSetting('smile','flash','on')
-        self._confirmSettingMode('flash','on')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 2
-    def testCaptureSmileImageWithFlashOff(self):
-        """
-        Summary:Capture image with Flash OFF.
-        Step:
-        1.Launch smile capture activity
-        2.Set flash OFF
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set flash OFF
-        SM.setCameraSetting('smile','flash','off')
-        self._confirmSettingMode('flash','off')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 3
-    def testCaptureSmileImageWithFlashAuto(self):
-        """
-        Summary:Capture image with Flash AUTO.
-        Step:
-        1.Launch smile capture activity
-        2.Set flash to AUTO mode
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set flash AUTO
-        SM.setCameraSetting('smile','flash','auto')
-        self._confirmSettingMode('flash','auto')
+        flash_mode = random.choice(FLASH_MODE)
+        # Step 2
+        SM.setCameraSetting('smile','flash',FLASH_MODE.index(flash_mode)+1)
+        self._confirmSettingMode('flash',flash_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
 
     # Testcase 4
-    def testCaptureSmileImageWithExposureAuto(self):
+    def testCaptureSmileImageWithExposure(self):
         """
-        Summary:Capture image with Exposure auto.
+        Summary:Capture image with Exposure mode.
         Step:
         1.Launch smile capture activity
-        2.Set exposure auto
+        2.Set exposure mode
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2 Set exposure auto
-        SM.setCameraSetting('smile',4,3)
-        self._confirmSettingMode('exposure','0')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 5
-    def testCaptureSmileImageWithExposurePlusOne(self):
-        """
-        Summary:Capture image with Exposure 1.
-        Step:
-        1.Launch smile capture activity
-        2.Set exposure 1
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set exposure 1
-        SM.setCameraSetting('smile',4,4)
-        self._confirmSettingMode('exposure','3')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 6
-    def testCaptureSmileImageWithExposurePlusTwo(self):
-        """
-        Summary:Capture image with Exposure 2.
-        Step:
-        1.Launch smile capture activity
-        2.Set exposure 2
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set exposure 2
-        SM.setCameraSetting('smile',4,5)
-        self._confirmSettingMode('exposure','6')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 7
-    def testCaptureSmileImageWithExposureRedOne(self):
-        """
-        Summary:Capture image with Exposure -1.
-        Step:
-        1.Launch smile capture activity
-        2.Set exposure -1
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set exposure -1
-        SM.setCameraSetting('smile',4,2)
-        self._confirmSettingMode('exposure','-3')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 8
-    def testCaptureSmileImageWithExposureRedTwo(self):
-        """
-        Summary:Capture image with Exposure -2.
-        Step:
-        1.Launch smile capture activity
-        2.Set exposure -2
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set exposure -2
-        SM.setCameraSetting('smile',4,1)
-        self._confirmSettingMode('exposure','-6')
+        exposure_mode = random.choice(EXPOSURE_MODE)
+        # Step 2
+        SM.setCameraSetting('smile',4,EXPOSURE_MODE.index(exposure_mode)+1)
+        self._confirmSettingMode('exposure',exposure_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
 
     # Testcase 9
-    def testCaptureSmileImageWithSceneAuto(self):
+    def testCaptureSmileImageWithScene(self):
         """
-        Summary:Capture image with Scene mode AUTO.
+        Summary:Capture image with Scene mode.
         Step:
         1.Launch smile capture activity
-        2.Set scene mode AUTO
+        2.Set scene mode
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
+        scene_mode = [SCENE_MODE]
         # Step 2  Set scene mode AUTO
-        SM.setCameraSetting('smile',3,7)
-        self._confirmSettingMode('scenemode','auto')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 10
-    def testCaptureSmileImageWithSceneSports(self):
-        """
-        Summary:Capture image with Scene mode Sports.
-        Step:
-        1.Launch smile capture activity
-        2.Set scene mode Sports
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode Sports
-        SM.setCameraSetting('smile',3,6)
-        self._confirmSettingMode('scenemode','sports')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 11
-    def testCaptureSmileImageWithSceneNight(self):
-        """
-        Summary:Capture image with Scene mode Night.
-        Step:
-        1.Launch smile capture activity
-        2.Set scene mode Night
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode Night
-        SM.setCameraSetting('smile',3,5)
-        self._confirmSettingMode('scenemode','night')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 12
-    def testCaptureSmileImageWithSceneLandscape(self):
-        """
-        Summary:Capture image with Scene mode Landscape.
-        Step:
-        1.Launch smile capture activity
-        2.Set scene mode Landscape
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode Landscape
-        SM.setCameraSetting('smile',3,4)
-        self._confirmSettingMode('scenemode','landscape')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 13
-    def testCaptureSmileImageWithScenePortrait(self):
-        """
-        Summary:Capture image with Scene mode Portrait.
-        Step:
-        1.Launch smile capture activity
-        2.Set scene mode Portrait
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode Portrait
-        SM.setCameraSetting('smile',3,3)
-        self._confirmSettingMode('scenemode','portrait')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 14
-    def testCaptureSmileImageWithSceneNightPortrait(self):
-        """
-        Summary:Capture image with Scene mode NightPortrait.
-        Step:
-        1.Launch smile capture activity
-        2.Set scene mode NightPortrait
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode NightPortrait
-        SM.setCameraSetting('smile',3,2)
-        self._confirmSettingMode('scenemode','night-portrait')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 15
-    def testCaptureSmileImageWithSceneBarcode(self):
-        """
-        Summary:Capture image with Scene mode barcode.
-        Step:
-        1.Launch smile capture activity
-        2.Set scene mode barcode
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set scene mode barcode
-        SM.setCameraSetting('smile',3,1)
-        self._confirmSettingMode('scenemode','barcode')
+        SM.setCameraSetting('smile',3,SCENE_MODE.index(scene_mode)+1)
+        self._confirmSettingMode('scenemode',scene_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
 
     # Testcase 16
-    def testCaptureSmileImageWithPictureSizeWidescreen(self):
+    def testCaptureSmileImageWithPictureSize(self):
         """
-        Summary:Capture image with Photo size 6M.
+        Summary:Capture image with Photo size.
         Step:
         1.Launch smile capture activity
-        2.Set photo size 6M
+        2.Set photo size
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2  Set photo size 6M
-        SM.setCameraSetting('smile',2,1)
-        self._confirmSettingMode('picture_size','WideScreen')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm(2)
-
-    # Testcase 17
-    def testCaptureSmileImageWithPictureSizeStandardScreen(self):
-        """
-        Summary:Capture image with Scene mode barcode.
-        Step:
-        1.Launch smile capture activity
-        2.Set photo size 13M
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2  Set photo size 13M
-        SM.setCameraSetting('smile',2,2)
-        self._confirmSettingMode('picture_size','StandardScreen')
+        size_mode = [PICTURESIZE_MODE]
+        # Step 2
+        SM.setCameraSetting('smile',2,PICTURESIZE_MODE.index(size_mode)+1)
+        self._confirmSettingMode('picturesize',size_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
 
     # Testcase 18
-    def testCaptureSingleImageWithLocationOn(self):
+    def testCaptureSmileImageWithLocation(self):
         """
-        Summary:Capture image with Geo-tag ON.
+        Summary:Capture image with Geo-tag.
         Step:
         1.Launch smile capture activity
-        2.Set Ge0-tag ON
+        2.Set Ge0-tag
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2 Set Ge0-tag ON.
-        SM.setCameraSetting('smile',3,2)
-        self._confirmSettingMode('location','on')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 19
-    def testCaptureSingleImageWithLocationOff(self):
-        """
-        Summary:Capture image with Geo-tag OFF by front Face camera.
-        Step:
-        1.Launch smile capture activity
-        2.Set Ge0-tag OFF
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set Ge0-tag OFF.
-        SM.setCameraSetting('smile',3,1)
-        self._confirmSettingMode('location','off')
+        location_mode = random.choice(LOCATION_MODE)
+        # Step 2.
+        SM.setCameraSetting('smile',1,LOCATION_MODE.index(location_mode)+1)
+        self._confirmSettingMode('location',location_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm()
 
     # Testcase 20
-    def testCaptureSmileImageWithISOAuto(self):
+    def testCaptureSmileImageWithISO(self):
         """
-        Summary:Capture image with ISO Setting Auto.
+        Summary:Capture image with ISO Setting.
         Step:
         1.Launch smile capture activity
-        2.Set ISO Setting Auto
+        2.Set ISO Setting
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2 Set ISO Setting Auto
-        SM.setCameraSetting('smile',6,5)
-        self._confirmSettingMode('iso','iso-auto')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 21
-    def testCaptureSmileImageWithISOOneH(self):
-        """
-        Summary:Capture image with ISO Setting 100.
-        Step:
-        1.Launch smile capture activity
-        2.Set ISO Setting 100
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set ISO Setting 100
-        SM.setCameraSetting('smile',6,4)
-        self._confirmSettingMode('iso','iso-100')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 22
-    def testCaptureSmileImageWithISOTwoH(self):
-        """
-        Summary:Capture image with ISO Setting 200.
-        Step:
-        1.Launch smile capture activity
-        2.Set ISO Setting 200
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set ISO Setting 200
-        SM.setCameraSetting('smile',6,3)
-        self._confirmSettingMode('iso','iso-200')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 23
-    def testCaptureSmileImageWithISOFourH(self):
-        """
-        Summary:Capture image with ISO Setting 400.
-        Step:
-        1.Launch smile capture activity
-        2.Set ISO Setting 400
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set ISO Setting 400
-        SM.setCameraSetting('smile',6,2)
-        self._confirmSettingMode('iso','iso-400')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 24
-    def testCaptureSmileImageWithISOEightH(self):
-        """
-        Summary:Capture image with ISO Setting 800.
-        Step:
-        1.Launch smile capture activity
-        2.Set ISO Setting 800
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Set ISO Setting 800
-        SM.setCameraSetting('smile',6,1)
-        self._confirmSettingMode('iso','iso-800')
+        iso_mode = random.choice(ISO_MODE)
+        # Step 2
+        SM.setCameraSetting('smile',6,ISO_MODE(iso_mode)+1)
+        self._confirmSettingMode('iso',iso_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm()
 
     # Testcase 25
-    def testCaptureSmileImageWithWBAuto(self):
+    def testCaptureSmileImageWithWB(self):
         """
-        Summary:Capture image with White Balance Auto.
+        Summary:Capture image with White Balance.
         Step:
         1.Launch smile capture activity
-        2.Set White Balance Auto
+        2.Set White Balance
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        # Step 2 Capture image with White Balance Auto.
-        SM.setCameraSetting('smile',5,5)
-        self._confirmSettingMode('whitebalance','auto')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 26
-    def testCaptureSmileImageWithWBIncandescent(self):
-        """
-        Summary:Capture image with White Balance Incandescent.
-        Step:
-        1.Launch smile capture activity
-        2.Set White Balance Incandescent
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Capture image with White Balance Incandescent.
-        SM.setCameraSetting('smile',5,4)
-        self._confirmSettingMode('whitebalance','incandescent')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 27
-    def testCaptureSmileImageWithWBDaylight(self):
-        """
-        Summary:Capture image with White Balance Daylight.
-        Step:
-        1.Launch smile capture activity
-        2.Set White Balance Daylight
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Capture image with White Balance Daylight.
-        SM.setCameraSetting('smile',5,3)
-        self._confirmSettingMode('whitebalance','daylight')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()
-
-    # Testcase 28
-    def testCaptureSmileImageWithWBFluorescent(self):
-        """
-        Summary:Capture image with White Balance Fluorescent.
-        Step:
-        1.Launch smile capture activity
-        2.Set White Balance Fluorescent
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Capture image with White Balance Fluorescent.
-        SM.setCameraSetting('smile',5,2)
-        self._confirmSettingMode('whitebalance','fluorescent')
-        # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
-        self._capturePictureAndConfirm()  
-
-    # Testcase 29
-    def testCaptureSmileImageWithWBCloudy(self):
-        """
-        Summary:Capture image with White Balance Cloudy.
-        Step:
-        1.Launch smile capture activity
-        2.Set White Balance Cloudy
-        3.Touch shutter button to capture picture
-        4.Exit  activity
-        """
-        # Step 2 Capture image with White Balance Cloudy.
-        SM.setCameraSetting('smile',5,1)
-        self._confirmSettingMode('whitebalance','cloudy')
+        wb_mode = random.choice(WB_MODE)
+        # Step 2.
+        SM.setCameraSetting('smile',5,WB_MODE.index(wb_mode)+1)
+        self._confirmSettingMode('whitebalance',wb_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm()
 
