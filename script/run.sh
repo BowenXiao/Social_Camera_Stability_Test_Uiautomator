@@ -1,0 +1,1 @@
+python -m unittest -v burstslowcapture && python -m unittest -v continuous && python -m unittest -v hdrcapture && python -m unittest -v panorama && python -m unittest -v perfectshot && python -m unittest -v quickswitch && python -m unittest -v singlecamera && python -m unittest -v smilecamera
