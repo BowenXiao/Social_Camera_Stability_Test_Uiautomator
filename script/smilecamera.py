@@ -5,6 +5,7 @@ import unittest
 import commands
 import util
 import string
+import random
 
 A  = util.Adb()
 SM = util.SetMode()
