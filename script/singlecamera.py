@@ -21,7 +21,7 @@ LOCATION_MODE   = ['off','on']
 TIMER_MODE      = ['0','3','5','10']
 ISO_MODE        = ['iso-800','iso-400','iso-200','iso-100','iso-auto']
 WB_MODE         = ['cloudy','fluorescent','daylight','incandescent','auto']
-
+##########################################################################################
 class CameraTest(unittest.TestCase):
 
     def setUp(self):
@@ -41,8 +41,9 @@ class CameraTest(unittest.TestCase):
     def tearDown(self):
         super(CameraTest,self).tearDown()
         #4.Exit  activity
-        self._pressBack(4)
         TB.switchBackOrFrontCamera('back')
+        self._pressBack(4)
+
 
 
     # Testcase 1
