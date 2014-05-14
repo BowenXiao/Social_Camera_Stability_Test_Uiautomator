@@ -41,7 +41,6 @@ class CameraTest(unittest.TestCase):
         super(CameraTest,self).tearDown()
         #4.Exit  activity
         self._pressBack(4)
-        A.cmd('pm','com.intel.camera22')
 
     # Testcase 1
     def testCaptureSmileImageWithFlash(self):
@@ -93,6 +92,7 @@ class CameraTest(unittest.TestCase):
         self._confirmSettingMode('scenemode',scene_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
+        SM.setCameraSetting('smile',3,7)
 
     # Testcase 16
     def testCaptureSmileImageWithPictureSize(self):
@@ -110,6 +110,7 @@ class CameraTest(unittest.TestCase):
         self._confirmSettingMode('picturesize',size_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
+        SM.setCameraSetting('smile',2,1)
 
     # Testcase 18
     def testCaptureSmileImageWithLocation(self):

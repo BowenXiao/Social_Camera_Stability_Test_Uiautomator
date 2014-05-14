@@ -44,8 +44,6 @@ class CameraTest(unittest.TestCase):
         TB.switchBackOrFrontCamera('back')
         self._pressBack(4)
 
-
-
     # Testcase 1
     def testCaptureSingleImageWithFlash(self):
         """
@@ -96,6 +94,7 @@ class CameraTest(unittest.TestCase):
         self._confirmSettingMode('scenemode',scene_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
+        SM.setCameraSetting('single',5,7)
 
     # Testcase 4
     def testCaptureSingleImageWithFDFR(self):
@@ -129,6 +128,7 @@ class CameraTest(unittest.TestCase):
         self._confirmSettingMode('picture_size',size_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
+        SM.setCameraSetting('single',4,3)
 
     # Testcase 6
     def testCaptureSingleImageWithHits(self):
@@ -163,6 +163,7 @@ class CameraTest(unittest.TestCase):
         self._confirmSettingMode('delay',timer_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
+        SM.setCameraSetting('single',9,5)
 
     # Testcase 8
     def testCaptureSingleImageWithISO(self):
