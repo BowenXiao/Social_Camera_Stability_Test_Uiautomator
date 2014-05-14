@@ -55,7 +55,7 @@ class CameraTest(unittest.TestCase):
         """
         flash_mode = random.choice(FLASH_MODE)
         # Step 2
-        SM.setCameraSetting('smile','flash',FLASH_MODE.index(flash_mode)+1)
+        SM.setCameraSetting('smile','flash',flash_mode)
         self._confirmSettingMode('flash',flash_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
