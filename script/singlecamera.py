@@ -163,7 +163,7 @@ class CameraTest(unittest.TestCase):
         self._confirmSettingMode('delay',timer_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
-        SM.setCameraSetting('single',9,5)
+        SM.setCameraSetting('single',9,1)
 
     # Testcase 8
     def testCaptureSingleImageWithISO(self):
