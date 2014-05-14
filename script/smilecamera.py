@@ -35,7 +35,8 @@ class CameraTest(unittest.TestCase):
         if  d(text = 'OK').wait.exists(timeout = 3000):
             d(text = 'OK').click.wait()
         assert d(resourceId = 'com.intel.camera22:id/shutter_button'),'Launch camera failed!!'
-        TB.switchBackOrFrontCamera('back')
+        SM.switchcamera('smile')
+
 
     def tearDown(self):
         super(CameraTest,self).tearDown()
