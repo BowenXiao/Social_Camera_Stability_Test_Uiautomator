@@ -88,13 +88,15 @@ class CameraTest(unittest.TestCase):
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        scene_mode = [SCENE_MODE]
+        scene_mode = random.choice(SCENE_MODE)
         # Step 2  Set scene mode AUTO
         SM.setCameraSetting('smile',3,SCENE_MODE.index(scene_mode)+1)
+        time.sleep(1) 
         self._confirmSettingMode('scenemode',scene_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
-        SM.setCameraSetting('smile',3,7)
+        self._setScenesToAuto()
+
 
     # Testcase 16
     def testCaptureSmileImageWithPictureSize(self):
@@ -106,13 +108,12 @@ class CameraTest(unittest.TestCase):
         3.Touch shutter button to capture picture
         4.Exit  activity
         """
-        size_mode = [PICTURESIZE_MODE]
+        size_mode = random.choice(PICTURESIZE_MODE)
         # Step 2
         SM.setCameraSetting('smile',2,PICTURESIZE_MODE.index(size_mode)+1)
-        self._confirmSettingMode('picturesize',size_mode)
+        self._confirmSettingMode('picture_size',size_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm(2)
-        SM.setCameraSetting('smile',2,1)
 
     # Testcase 18
     def testCaptureSmileImageWithLocation(self):
@@ -143,7 +144,7 @@ class CameraTest(unittest.TestCase):
         """
         iso_mode = random.choice(ISO_MODE)
         # Step 2
-        SM.setCameraSetting('smile',6,ISO_MODE(iso_mode)+1)
+        SM.setCameraSetting('smile',6,ISO_MODE.index(iso_mode)+1)
         self._confirmSettingMode('iso',iso_mode)
         # Step 3 Touch shutter button to capture picture and confirm picture count + 1.
         self._capturePictureAndConfirm()
@@ -168,6 +169,15 @@ class CameraTest(unittest.TestCase):
     def _pressBack(self,touchtimes):
         for i in range(1,touchtimes+1):
             d.press('back')
+
+
+    def _setScenesToAuto(self):
+        commands.getoutput('adb shell input swipe 530 6 523 22')
+        time.sleep(1)
+        d.click(300,185)
+        time.sleep(1)
+        d.click(710,282)
+        time.sleep(1)
 
     def _confirmSettingMode(self,sub_mode,option):
         if sub_mode == 'location':

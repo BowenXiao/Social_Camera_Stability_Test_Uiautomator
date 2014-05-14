@@ -119,7 +119,8 @@ class CameraTest(unittest.TestCase):
         assert bool(a.cmd('cat',PATH + SCENE_KEY).find(scence)+1)
         #Step 3
         self._continuouCapturePic()
-   
+        time.sleep(1)
+        sm.setCameraSetting('perfectshot',5,8)   
 
 
     # Test case 4
@@ -149,7 +150,7 @@ class CameraTest(unittest.TestCase):
         sm.setCameraSetting('single',4,PICTURESIZE_OPTION.index(picturesize)+1)
         assert bool(a.cmd('cat',PATH + PICTURE_SIZE_KEY).find(picturesize)+1)
         self._continuouCapturePic()
-
+        sm.setCameraSetting('single',4,1)
 
 
     # Test case 6
@@ -202,6 +203,7 @@ class CameraTest(unittest.TestCase):
         fdfr =random.choice(FDFR_OPTION)
         sm.setCameraSetting('single','fdfr',fdfr)
         self._continuouCapturePic()
+        tb.switchBackOrFrontCamera('back')
 
 
 
@@ -223,7 +225,7 @@ class CameraTest(unittest.TestCase):
         #Step 3
         #Step 3
         self._continuouCapturePic()
-
+        tb.switchBackOrFrontCamera('back')
     # Test case 10
     #def testCapturepictureWithSelfTimer(self):
         """

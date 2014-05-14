@@ -94,6 +94,7 @@ class CameraTest(unittest.TestCase):
         #Launch social camera
         self._launchCamera()
         SM.switchcamera('video')
+        time.sleep(2)
 
     def tearDown(self):
         super(CameraTest,self).tearDown()
@@ -128,6 +129,7 @@ class CameraTest(unittest.TestCase):
         SM.setCameraSetting('video',3,VSIZE_OPTION.index(vsize)+1) #Tap on the selected option by its index
         assert bool(AD.cmd('cat',VIDEOSIZE_STATE).find(vsize)+1)
         self._takeVideoAndCheckCount()
+
 
     def testRecordVideoWithGeoLocation(self):
         '''

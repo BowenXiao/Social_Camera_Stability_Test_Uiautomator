@@ -47,8 +47,7 @@ class CameraTest(unittest.TestCase):
         time.sleep(2)
         if  d(text = 'OK').wait.exists(timeout = 3000):
             d(text = 'OK').click.wait()
-        else:
-            assert d(resourceId = 'com.intel.camera22:id/shutter_button'),'Launch camera failed!!'
+        assert d(resourceId = 'com.intel.camera22:id/shutter_button'),'Launch camera failed!!'
         sm.switchcamera('perfectshot')
         time.sleep(1)
 
@@ -103,6 +102,8 @@ class CameraTest(unittest.TestCase):
         assert bool(a.cmd('cat',PATH + SCENE_KEY).find(scence)+1)
         #Step 3
         self._checkCapturedPic()
+        time.sleep(1)
+        sm.setCameraSetting('perfectshot',2,7)
 
 
 
