@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # coding:utf-8
 
-from devicewrapper.android import device as d
+from uiautomatorplug.android import device as d
 import commands
 import re
 import subprocess
